@@ -1,4 +1,4 @@
-Mautic WordPress plugin [![Build Status](https://travis-ci.org/mautic/mautic-wordpress.svg?branch=master)](https://travis-ci.org/mautic/mautic-wordpress) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mautic/mautic-wordpress/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mautic/mautic-wordpress/?branch=master) [![Code Coverage](https://scrutinizer-ci.com/g/mautic/mautic-wordpress/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/mautic/mautic-wordpress/?branch=master)
+Mautic WordPress plugin (fork)
 =======================
 
 [Mautic](http://mautic.org) [Wordpress Plugin](https://wordpress.org/plugins/wp-mautic/) injects Mautic tracking script and image in the WP website. Your Mautic instance will be able to track information about your visitors. You can also insert Mautic content inside your website using different shortcodes.
@@ -11,6 +11,16 @@ Mautic WordPress plugin [![Build Status](https://travis-ci.org/mautic/mautic-wor
 - Tracking image can be used as fallback when JavaScript is disabled.
 
 ## Installation
+
+### Manually, as this is a fork of WP Mautic
+the two default methods described below will not work for this fork of the plugin. To get this fork installed, you'll have to create a zip file and do a manual upload to your WP instance
+create a zip file with the following files/folders:
+
+wp-mautic
+ - index.php
+ - options.php
+ - shortcodes.php
+ - wpmautic.php
 
 ### Via WP administration
 
@@ -34,6 +44,13 @@ Once installed, the plugin must appared in your plugin list :
 
 1. Enable it.
 2. Go to the settings page and set your Mautic instance URL.
+3. you will find two extra options for script integration under header/footer:
+- "Only script embedded within footer" - this only loads mtc.js and adds an object mt_attrs. The tracking itself can be called by google tag manager and may contain the extra attributes in the form of 
+```html
+mt('send', 'pageview', mt_attrs);
+```
+- "Do not embed Mautic script" this will embed no mautic scripts at all, tracking can be handled by another plugin or Google Tag Manager. 
+All short codes should work like normal - for some it might be necessary that mtc.js is embedded elsewhere.
 
 And that's it !
 
