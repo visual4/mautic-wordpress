@@ -111,9 +111,11 @@ function wpmautic_injector() {
 	$script_location = wpmautic_option( 'script_location' );
 	if ( 'header' === $script_location ) {
 		add_action( 'wp_head', 'wpmautic_inject_script' );
-	} else {
+	} else if('footer' === $script_location) {
 		add_action( 'wp_footer', 'wpmautic_inject_script' );
-	}
+	} else if ('scriptonly' === $script_location){
+	    add_action('wp_footer', 'wpmautic_inject_scriptonly');
+    }
 
 	if ( true === wpmautic_option( 'fallback_activated', false ) ) {
 		add_action( 'wp_footer', 'wpmautic_inject_noscript' );
@@ -121,26 +123,58 @@ function wpmautic_injector() {
 }
 
 /**
+ * @return bool|string
+ */
+function wpmautic_getscript(){
+    $base_url = wpmautic_option( 'base_url', '' );
+	if ( empty( $base_url ) ) {
+		return false;
+	}
+	$script = sprintf("(function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
+		w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
+		m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','%s/mtc.js','mt');", esc_url($base_url));
+
+	return $script;
+
+}
+
+
+/**
  * Writes Tracking JS to the HTML source
  *
  * @return void
  */
 function wpmautic_inject_script() {
-	$base_url = wpmautic_option( 'base_url', '' );
-	if ( empty( $base_url ) ) {
-		return;
-	}
 
-	$attrs = wpmautic_get_tracking_attributes();
+    $attrs = wpmautic_get_tracking_attributes();
+    $script = wpmautic_getscript();
+    if (!$script) return;
+	?>
+    <script type="text/javascript">
+        <?php echo $script; ?>
+	    mt('send', 'pageview'<?php echo count( $attrs ) > 0 ? ', ' . wp_json_encode( $attrs ) : ''; ?>);
+    </script>
+	<?php
+}
 
-	?><script type="text/javascript">
-	(function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
-		w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
-		m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','<?php echo esc_url( $base_url ); ?>/mtc.js','mt');
+/**
+ * Writes MT Source and Attributes to the HTML source
+ *
+ * @return void
+ */
+function wpmautic_inject_scriptonly() {
 
-	mt('send', 'pageview'<?php echo count( $attrs ) > 0 ? ', ' . wp_json_encode( $attrs ) : ''; ?>);
-</script>
+    $attrs = wpmautic_get_tracking_attributes();
+    $script = wpmautic_getscript();
+    if (!$script) return;
+	?>
+    <script type="text/javascript">
+        <?php
+        echo $script;
+	    echo count( $attrs ) > 0 ? 'mt_attrs=' . wp_json_encode( $attrs ) . ';' : 'mt_attrs={};';
+	    ?>
+    </script>
 	<?php
 }
 

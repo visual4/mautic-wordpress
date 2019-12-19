@@ -157,6 +157,32 @@ function wpmautic_script_location() {
 			/>
 			<?php echo wp_kses( __( 'Embedded within the <code>wp_footer</code> action.<br/>Inserts the tracking code before the <code>&lt;/body&gt;</code> tag; slightly better for performance but may track less reliably if users close the page before the script has loaded.', 'wp-mautic' ), $allowed_tags ); ?>
 		</label>
+        <br/>
+		<label>
+			<input
+				type="radio"
+				name="wpmautic_options[script_location]"
+				value="scriptonly"
+				<?php
+				if ( 'scriptonly' === $position ) :
+					?>
+					checked<?php endif; ?>
+			/>
+			<?php echo wp_kses( __( 'Only Script embedded within the <code>wp_footer</code> action.<br/>Inserts only the tracking script before the <code>&lt;/body&gt;</code> tag; this should be used if the tracking itself is triggered by tag manager.', 'wp-mautic' ), $allowed_tags ); ?>
+		</label>
+        <br/>
+		<label>
+			<input
+				type="radio"
+				name="wpmautic_options[script_location]"
+				value="noscript"
+				<?php
+				if ( 'noscript' === $position ) :
+					?>
+					checked<?php endif; ?>
+			/>
+			<?php echo wp_kses( __( 'Do not embed Mautic script<br/>With this option, you need to embed the code with another plugin or Google Tagmanger', 'wp-mautic' ), $allowed_tags ); ?>
+		</label>
 	</fieldset>
 	<?php
 }
@@ -224,7 +250,7 @@ function wpmautic_options_validate( $input ) {
 	$options['script_location'] = isset( $input['script_location'] )
 		? trim( $input['script_location'] )
 		: 'header';
-	if ( ! in_array( $options['script_location'], array( 'header', 'footer' ), true ) ) {
+	if ( ! in_array( $options['script_location'], array( 'header', 'footer', 'scriptonly', 'noscript' ), true ) ) {
 		$options['script_location'] = 'header';
 	}
 
